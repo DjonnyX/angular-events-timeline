@@ -1,0 +1,14 @@
+<div part="timeline" class="timeline">
+    <div part="wrapper" class="track__wrapper">
+        <ul part="track" class="track">
+            @let items = events();
+            @if (items) {
+                @for (item of items; track item.id) {
+                    @let cl = {'event': true, 'start': item.isStart, 'end': item.isEnd};
+                    <li tooltip [part]="cl" [ngClass]="cl" [ngStyle]="{'flex': item.size, 'background-color': item.color}"
+                        [message]="item.info"></li>
+                }
+            }
+        </ul>
+    </div>
+</div>

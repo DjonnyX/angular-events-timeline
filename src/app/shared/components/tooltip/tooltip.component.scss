@@ -1,0 +1,13 @@
+:host {
+    pointer-events: none;
+    display: block;
+}
+
+span {
+    pointer-events: none;
+    background-color: #292929;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}

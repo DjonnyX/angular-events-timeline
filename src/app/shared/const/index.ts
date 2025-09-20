@@ -1,0 +1,1 @@
+import { DEFAULT_COLORS } from './default-event-colors';
