@@ -16,9 +16,6 @@ const sort = (a: Event, b: Event): number => {
   }
   return 0;
 },
-  generateId = (type: number | string, start: number | string, end: number | string): string => {
-    return `${type}-${start}-${end}`;
-  },
   NONE = 'none';
 
 @Component({
@@ -42,27 +39,29 @@ export class EventsTimelineComponent {
         const result: TrackData = [], colors = this.colors(), tStart = Date.parse(data.intervalDates.dateStart),
           tEnd = Date.parse(data.intervalDates.dateEnd), total = tEnd - tStart, sorted = data.events.sort(sort);
 
-        let start = tStart;
+        let start = tStart, id = 0;
 
-        for (let i = 0, l = sorted.length, iEnd = l - 1; i < l; i++) {
-          const e = sorted[i], eStart = Date.parse(e.dateStart), eEnd = Date.parse(e.dateEnd), id = generateId(e.type, eStart, eEnd),
+        for (let i = 0, len = sorted.length; i < len; i++) {
+          const e = sorted[i], eStart = Date.parse(e.dateStart), eEnd = Date.parse(e.dateEnd),
             color = colors[e.type], info = getEventInfo(e);
 
           if (start < eStart) {
-            const l = eStart - start, size = `${(l * 100) / total}`, nId = generateId(NONE, start, eStart);
+            const l = eStart - start, size = `${(l * 100) / total}`;
             start += l;
+            id++;
             result.push({
-              id: nId,
+              id: `${id}`,
               color: NONE,
               size,
               info: undefined,
             });
           }
-          const isEnd = i === iEnd, l = eEnd - eStart, size = `${(l * 100) / total}`;
+          const isEnd = i === len - 1, l = eEnd - eStart, size = `${(l * 100) / total}`;
           start += l;
 
+          id++;
           result.push({
-            id,
+            id: `${id}`,
             color,
             size,
             info,
@@ -72,10 +71,11 @@ export class EventsTimelineComponent {
 
           if (isEnd) {
             if (start > 0) {
-              const l = tEnd - start, size = `${(l * 100) / total}`, nId = generateId(NONE, eEnd, tEnd);
+              const l = tEnd - start, size = `${(l * 100) / total}`;
               start += l;
+              id++;
               result.push({
-                id: nId,
+                id: `${id}`,
                 color: NONE,
                 size,
                 info: undefined,
