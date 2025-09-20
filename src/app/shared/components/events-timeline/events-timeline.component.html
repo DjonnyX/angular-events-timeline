@@ -5,7 +5,7 @@
             @if (items) {
                 @for (item of items; track item.id) {
                     @let cl = {'event': true, 'start': item.isStart, 'end': item.isEnd};
-                    <li tooltip [part]="cl" [ngClass]="cl" [ngStyle]="{'flex': item.size, 'background-color': item.color}"
+                    <li tooltip [part]="cl" [ngClass]="cl" [ngStyle]="{'flex': item.size, 'background-color': item.color ?? 'none'}"
                         [message]="item.info"></li>
                 }
             }

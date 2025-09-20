@@ -35,14 +35,15 @@ export class TimelineComponent {
     $version.pipe(
       takeUntilDestroyed(),
       switchMap(() => {
-        return this._service.getEvents(); // of(MOCK_EVENTS_DATA); // static
+        // return of(MOCK_EVENTS_DATA); // static
+        return this._service.getEvents();
       }),
       tap(v => {
         this.eventCollection.set(v);
 
         setTimeout(() => {
           _$version.next(_$version.getValue() + 1);
-        }, 10000);
+        }, 500);
       }),
       catchError(err => {
         // etc

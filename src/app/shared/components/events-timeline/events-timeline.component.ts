@@ -8,10 +8,10 @@ import { TooltipDirective } from '../../directives';
 import { getEventInfo } from '../../utils/getEventInfo';
 
 const sort = (a: Event, b: Event): number => {
-  if (a.dateStart > b.dateStart) {
+  if (a.dateStart > b.dateEnd) {
     return 1;
   }
-  if (a.dateStart < b.dateStart) {
+  if (a.dateEnd < b.dateStart) {
     return -1;
   }
   return 0;
@@ -42,7 +42,8 @@ export class EventsTimelineComponent {
         let start = tStart, id = 0;
 
         for (let i = 0, len = sorted.length; i < len; i++) {
-          const e = sorted[i], eStart = Date.parse(e.dateStart), eEnd = Date.parse(e.dateEnd),
+          const isStart = i === 0, isEnd = i === len - 1, e = sorted[i],
+            eStart = Date.parse(e.dateStart), eEnd = Date.parse(e.dateEnd),
             color = colors[e.type], info = getEventInfo(e);
 
           if (start < eStart) {
@@ -53,10 +54,9 @@ export class EventsTimelineComponent {
               id: `${id}`,
               color: NONE,
               size,
-              info: undefined,
             });
           }
-          const isEnd = i === len - 1, l = eEnd - eStart, size = `${(l * 100) / total}`;
+          const l = eEnd - eStart, size = `${(l * 100) / total}`;
           start += l;
 
           id++;
@@ -65,7 +65,7 @@ export class EventsTimelineComponent {
             color,
             size,
             info,
-            isStart: i === 0,
+            isStart,
             isEnd,
           });
 
@@ -76,9 +76,7 @@ export class EventsTimelineComponent {
               id++;
               result.push({
                 id: `${id}`,
-                color: NONE,
                 size,
-                info: undefined,
               });
             }
           }

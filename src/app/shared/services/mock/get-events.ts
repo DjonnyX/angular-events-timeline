@@ -43,13 +43,14 @@ export const getMockEventsData = (): Data => {
         };
 
     const eventLength = 3 + Math.round(Math.random() * 20);
-    let time = delta;
+    let time = delta, startNum = dateStartNum;
 
     for (let i = 0; i < eventLength; i++) {
-        const sDelta = (Math.random() * time), start = dateStartNum + sDelta;
+        const sDelta = (Math.random() * time), start = startNum + sDelta;
         time -= sDelta;
         const eDelta = (Math.random() * time), end = start + eDelta;
         time -= eDelta;
+        startNum += sDelta + eDelta;
         const num = Math.round(Math.random() * 2) as (0 | 1 | 2), event: Event = {
             type: TYPE_BY_INDEX[num],
             dateStart: new Date(start).toString(),
