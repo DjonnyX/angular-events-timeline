@@ -1,4 +1,4 @@
-import { ComponentRef, Directive, ElementRef, HostListener, inject, input, OnInit } from '@angular/core';
+import { ComponentRef, Directive, ElementRef, HostListener, inject, input, OnDestroy, OnInit } from '@angular/core';
 import { Overlay, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { TooltipComponent } from '../../components/tooltip/tooltip.component';
@@ -6,7 +6,7 @@ import { TooltipComponent } from '../../components/tooltip/tooltip.component';
 @Directive({
   selector: '[tooltip]',
 })
-export class TooltipDirective implements OnInit {
+export class TooltipDirective implements OnInit, OnDestroy {
   message = input<string | undefined>();
 
   @HostListener('mouseenter')
@@ -50,5 +50,11 @@ export class TooltipDirective implements OnInit {
       }]);
 
     this._overlayRef = this._overlay.create({ positionStrategy });
+  }
+
+  ngOnDestroy(): void {
+    if (this._overlayRef.hasAttached()) {
+      this._overlayRef.detach();
+    }
   }
 }

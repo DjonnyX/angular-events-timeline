@@ -7,7 +7,8 @@ import { EventsService } from '../../shared/services/events.service';
 import { EventsTimelineComponent } from '../../shared/components';
 import { Data } from '../../shared/models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, of, switchMap, tap } from 'rxjs';
+// import { MOCK_EVENTS_DATA } from '../../shared/services/mock';
 
 @Component({
   selector: 'app-timeline',
@@ -28,12 +29,20 @@ export class TimelineComponent {
   private _service = inject(EventsService);
 
   constructor() {
-    const $events = this._service.getEvents();
+    const _$version = new BehaviorSubject<number>(0),
+      $version = _$version.asObservable();
 
-    $events.pipe(
+    $version.pipe(
       takeUntilDestroyed(),
+      switchMap(() => {
+        return this._service.getEvents(); // of(MOCK_EVENTS_DATA); // static
+      }),
       tap(v => {
         this.eventCollection.set(v);
+
+        setTimeout(() => {
+          _$version.next(_$version.getValue() + 1);
+        }, 1000);
       }),
       catchError(err => {
         // etc
