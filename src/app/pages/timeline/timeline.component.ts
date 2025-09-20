@@ -42,7 +42,7 @@ export class TimelineComponent {
 
         setTimeout(() => {
           _$version.next(_$version.getValue() + 1);
-        }, 1000);
+        }, 10000);
       }),
       catchError(err => {
         // etc
