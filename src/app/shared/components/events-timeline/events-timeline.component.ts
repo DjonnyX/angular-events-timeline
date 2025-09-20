@@ -1,22 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, Signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, ElementRef, input, signal, Signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { Data, EventColors, Event } from '../../models';
 import { TrackData } from '../../models/track-data.type';
 import { isValidEventsData } from '../../utils';
 import { DEFAULT_COLORS } from '../../const/default-event-colors';
 import { TooltipDirective } from '../../directives';
 import { getEventInfo } from '../../utils/getEventInfo';
+import { EventCompiled } from '../../models/event-compiled.interface';
 
-const sort = (a: Event, b: Event): number => {
-  if (a.dateStart > b.dateEnd) {
-    return 1;
-  }
+const sort = (a: EventCompiled, b: EventCompiled): number => {
   if (a.dateEnd < b.dateStart) {
     return -1;
   }
+  if (a.dateStart > b.dateEnd) {
+    return 1;
+  }
   return 0;
-},
-  NONE = 'none';
+};
 
 @Component({
   selector: 'events-timeline',
@@ -32,52 +32,66 @@ export class EventsTimelineComponent {
 
   events: Signal<TrackData>;
 
+  private _bounds = signal<{ width: number, height: number } | null>(null);
+
+  private _onResizeHandler = () => {
+    const bounds = this._track()?.nativeElement?.getBoundingClientRect();
+    if (bounds) {
+      this._bounds.set({ width: bounds.width, height: bounds.height });
+    }
+  };
+
+  private _resizeObserver = new ResizeObserver(this._onResizeHandler);
+
+  private _track = viewChild<ElementRef<HTMLUListElement>>('track');
+
   constructor() {
+    effect(() => {
+      const track = this._track();
+      if (track && track.nativeElement) {
+        this._resizeObserver.observe(track.nativeElement);
+      }
+    });
+
     this.events = computed(() => {
-      const data = this.data();
-      if (data && isValidEventsData(data)) {
+      const data = this.data(), bounds = this._bounds();
+      if (bounds && data && isValidEventsData(data)) {
         const result: TrackData = [], colors = this.colors(), tStart = Date.parse(data.intervalDates.dateStart),
-          tEnd = Date.parse(data.intervalDates.dateEnd), total = tEnd - tStart, sorted = data.events.sort(sort);
+          tEnd = Date.parse(data.intervalDates.dateEnd), total = tEnd - tStart, sorted = data.events.map(v => ({
+            type: v.type, dateStart: Date.parse(v.dateStart),
+            dateEnd: Date.parse(v.dateEnd)
+          })).sort(sort);
 
-        let start = tStart, id = 0;
+        let start = tStart;
 
-        for (let i = 0, len = sorted.length; i < len; i++) {
-          const isStart = i === 0, isEnd = i === len - 1, e = sorted[i],
-            eStart = Date.parse(e.dateStart), eEnd = Date.parse(e.dateEnd),
+        for (let i = 0, len = sorted.length, endIndex = len - 1; i < len; i++) {
+          const isStart = i === 0, isEnd = i === endIndex, e = sorted[i],
+            eStart = e.dateStart, eEnd = e.dateEnd,
             color = colors[e.type], info = getEventInfo(e);
 
+            let pos = 0;
           if (start < eStart) {
-            const l = eStart - start, size = `${(l * 100) / total}`;
-            start += l;
-            id++;
-            result.push({
-              id: `${id}`,
-              color: NONE,
-              size,
-            });
+            pos = eStart - start;
+            start += pos;
           }
-          const l = eEnd - eStart, size = `${(l * 100) / total}`;
-          start += l;
+          const l = eEnd - eStart, size = `${(l / total) * bounds.width}px`;
 
-          id++;
           result.push({
-            id: `${id}`,
+            id: `${i}`,
             color,
             size,
+            position: `translate3d(${bounds.width - (((tEnd - start) / total) * bounds.width)}px, 0, 0)`,
             info,
             isStart,
             isEnd,
+            zIndex: '1',
           });
+          start += l;
 
           if (isEnd) {
             if (start > 0) {
-              const l = tEnd - start, size = `${(l * 100) / total}`;
-              start += l;
-              id++;
-              result.push({
-                id: `${id}`,
-                size,
-              });
+              const l2 = tEnd - start;
+              start += l2;
             }
           }
         }

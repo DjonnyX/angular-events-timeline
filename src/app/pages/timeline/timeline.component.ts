@@ -8,7 +8,7 @@ import { EventsTimelineComponent } from '../../shared/components';
 import { Data } from '../../shared/models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, of, switchMap, tap } from 'rxjs';
-// import { MOCK_EVENTS_DATA } from '../../shared/services/mock';
+import { MOCK_EVENTS_DATA } from '../../shared/services/mock';
 
 @Component({
   selector: 'app-timeline',

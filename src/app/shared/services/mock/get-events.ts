@@ -4,19 +4,19 @@ import { Data, Event } from "../../models";
 export const MOCK_EVENTS_DATA: Data = {
     events: [
         {
-            dateStart: '2022-01-01T08:11:00',
-            dateEnd: '2022-01-01T10:50:00',
-            type: EventTypes.NORMAL,
-        },
-        {
-            dateStart: '2022-01-01T18:21:00',
-            dateEnd: '2022-01-01T20:44:11',
-            type: EventTypes.DANGEROUS,
-        },
-        {
             dateStart: '2022-01-01T01:00:00',
             dateEnd: '2022-01-01T02:00:00',
             type: EventTypes.CRITICAL,
+        },
+        {
+            dateStart: '2022-01-01T08:21:00',
+            dateEnd: '2022-01-01T14:44:11',
+            type: EventTypes.DANGEROUS,
+        },
+        {
+            dateStart: '2022-01-01T22:11:00',
+            dateEnd: '2022-01-01T23:50:00',
+            type: EventTypes.NORMAL,
         },
     ],
     intervalDates: {
