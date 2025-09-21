@@ -1,7 +1,7 @@
 /**
  * Track Event
  */
-export interface ITrackEvent {
+export interface TrackEvent {
     id: string;
     size: string;
     position: string;

@@ -1,6 +1,6 @@
-import { ITrackEvent } from "./track-event.interface";
+import { TrackEvent } from "./track-event.interface";
 
 /**
  * Events Track Data
  */
-export type TrackData = Array<ITrackEvent>;
+export type TrackData = Array<TrackEvent>;

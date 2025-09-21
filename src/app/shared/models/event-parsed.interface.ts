@@ -3,7 +3,7 @@ import { EventTypes } from "../enums";
 /**
  * Event
  */
-export interface EventCompiled {
+export interface EventParsed {
     /**
      * Date start
      */

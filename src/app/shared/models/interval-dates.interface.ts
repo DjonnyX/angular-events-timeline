@@ -1,6 +1,6 @@
-import { IDateRange } from "./date-range.interface";
+import { DateRange } from "./date-range.interface";
 
 /**
  * Interval dates
  */
-export interface IntervalDates extends IDateRange { }
+export interface IntervalDates extends DateRange { }

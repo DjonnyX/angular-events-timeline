@@ -6,9 +6,9 @@ import { isValidEventsData } from '../../utils';
 import { DEFAULT_COLORS } from '../../const/default-event-colors';
 import { TooltipDirective } from '../../directives';
 import { getEventInfo } from '../../utils/getEventInfo';
-import { EventCompiled } from '../../models/event-compiled.interface';
+import { EventParsed } from '../../models/event-parsed.interface';
 
-const sort = (a: EventCompiled, b: EventCompiled): number => {
+const sort = (a: EventParsed, b: EventParsed): number => {
   if (a.dateEnd < b.dateStart) {
     return -1;
   }
