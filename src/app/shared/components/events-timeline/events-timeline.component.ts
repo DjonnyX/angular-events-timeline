@@ -1,19 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, ElementRef, input, signal, Signal, viewChild, ViewEncapsulation } from '@angular/core';
-import { Data, EventColors, Event } from '../../models';
-import { TrackData } from '../../models/track-data.type';
-import { isValidEventsData } from '../../utils';
-import { DEFAULT_COLORS } from '../../const/default-event-colors';
 import { TooltipDirective } from '../../directives';
+import { isValidEventsData } from '../../utils';
 import { getEventInfo } from '../../utils/getEventInfo';
+import { Data, EventColors } from '../../models';
+import { TrackData } from '../../models/track-data.type';
 import { EventParsed } from '../../models/event-parsed.interface';
+import { TrackEvent } from '../../models/track-event.interface';
+import { DEFAULT_COLORS } from '../../const/default-event-colors';
 
 const sort = (a: EventParsed, b: EventParsed): number => {
-  if (a.dateEnd < b.dateStart) {
-    return -1;
-  }
-  if (a.dateStart > b.dateEnd) {
+  if ((a.dateStart < b.dateStart && a.dateEnd < b.dateEnd) ||
+    (a.dateStart > b.dateEnd && a.dateEnd > b.dateEnd)
+  ) {
     return 1;
+  }
+
+  if (a.dateStart < b.dateStart && a.dateEnd < b.dateStart) {
+    return -1;
   }
   return 0;
 };
@@ -62,38 +66,55 @@ export class EventsTimelineComponent {
             dateEnd: Date.parse(v.dateEnd)
           })).sort(sort);
 
-        let start = tStart;
+        let min: TrackEvent | undefined = undefined, max: TrackEvent | undefined = undefined, start = tStart;
 
-        for (let i = 0, len = sorted.length, endIndex = len - 1; i < len; i++) {
-          const isStart = i === 0, isEnd = i === endIndex, e = sorted[i],
+        for (let i = 0, len = sorted.length; i < len; i++) {
+          const e = sorted[i],
             eStart = e.dateStart, eEnd = e.dateEnd,
             color = colors[e.type], info = getEventInfo(e);
 
-            let pos = 0;
-          if (start < eStart) {
-            pos = eStart - start;
-            start += pos;
-          }
-          const l = eEnd - eStart, size = `${(l / total) * bounds.width}px`;
+          const l = eEnd - eStart,
+            x = bounds.width - (bounds.width - (((eStart - tStart) / total) * bounds.width)),
+            w = (l / total) * bounds.width,
+            size = `${w}px`,
+            item: TrackEvent = {
+              id: `${i}`,
+              color,
+              size,
+              w,
+              x,
+              position: `translate3d(${x}px, 0, 0)`,
+              info,
+              isStart: false,
+              isEnd: false,
+              zIndex: '1',
+            };
 
-          result.push({
-            id: `${i}`,
-            color,
-            size,
-            position: `translate3d(${bounds.width - (((tEnd - start) / total) * bounds.width)}px, 0, 0)`,
-            info,
-            isStart,
-            isEnd,
-            zIndex: '1',
-          });
+          result.push(item);
           start += l;
 
-          if (isEnd) {
-            if (start > 0) {
-              const l2 = tEnd - start;
-              start += l2;
+          if (min) {
+            if (x < min.x) {
+              min = item;
             }
+          } else {
+            min = item;
           }
+
+          if (max) {
+            if ((x + w) > (max.x + max.w)) {
+              max = item;
+            }
+          } else {
+            max = item;
+          }
+        }
+
+        if (min) {
+          min.isStart = true;
+        }
+        if (max) {
+          max.isEnd = true;
         }
 
         return result;

@@ -5,7 +5,7 @@ export const MOCK_EVENTS_DATA: Data = {
     events: [
         {
             dateStart: '2022-01-01T01:00:00',
-            dateEnd: '2022-01-01T02:00:00',
+            dateEnd: '2022-01-01T12:00:00',
             type: EventTypes.CRITICAL,
         },
         {
